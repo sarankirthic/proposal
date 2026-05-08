@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Text Analysis App — Proposal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@300..700&display=swap" rel="stylesheet">
+<style>
+/* Design Tokens */
+:root, [data-theme="light"] {
+  --color-bg: #f7f6f2;
+  --color-surface: #f9f8f5;
+  --color-surface-2: #fbfbf9;
+  --color-surface-offset: #f3f0ec;
+  --color-surface-dynamic: #e6e4df;
+  --color-divider: #dcd9d5;
+  --color-border: #d4d1ca;
+  --color-text: #28251d;
+  --color-text-muted: #7a7974;
+  --color-text-faint: #bab9b4;
+  --color-primary: #01696f;
+  --color-primary-hover: #0c4e54;
+  --color-primary-highlight: #cedcd8;
+  --color-success: #437a22;
+  --color-success-highlight: #d4dfcc;
+  --color-gold: #d19900;
+  --color-gold-highlight: #e9e0c6;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px oklch(0.2 0.01 80 / 0.06);
+  --shadow-md: 0 4px 12px oklch(0.2 0.01 80 / 0.08);
+  --shadow-lg: 0 12px 32px oklch(0.2 0.01 80 / 0.12);
+  --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+  --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+  --text-2xl: clamp(2rem, 1.2rem + 2.5vw, 3.5rem);
+  --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
+  --space-4: 1rem; --space-5: 1.25rem; --space-6: 1.5rem;
+  --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem;
+  --space-16: 4rem; --space-20: 5rem; --space-24: 6rem;
+  --transition-interactive: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-body: 'Work Sans', 'Helvetica Neue', sans-serif;
+  --content-narrow: 640px;
+  --content-default: 880px;
+}
+[data-theme="dark"] {
+  --color-bg: #171614;
+  --color-surface: #1c1b19;
+  --color-surface-2: #201f1d;
+  --color-surface-offset: #1d1c1a;
+  --color-surface-dynamic: #2d2c2a;
+  --color-divider: #262523;
+  --color-border: #393836;
+  --color-text: #cdccca;
+  --color-text-muted: #797876;
+  --color-text-faint: #5a5957;
+  --color-primary: #4f98a3;
+  --color-primary-hover: #227f8b;
+  --color-primary-highlight: #313b3b;
+  --color-success: #6daa45;
+  --color-success-highlight: #3a4435;
+  --color-gold: #e8af34;
+  --color-gold-highlight: #4d4332;
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.2);
+  --shadow-md: 0 4px 12px oklch(0 0 0 / 0.3);
+  --shadow-lg: 0 12px 32px oklch(0 0 0 / 0.4);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+body {
+  min-height: 100dvh;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--color-text);
+  background: var(--color-bg);
+  line-height: 1.65;
+}
+img { display: block; max-width: 100%; }
+h1,h2,h3,h4 { font-family: var(--font-display); text-wrap: balance; line-height: 1.2; }
+p,li { text-wrap: pretty; max-width: 68ch; }
+a, button { transition: color var(--transition-interactive), background var(--transition-interactive), border-color var(--transition-interactive); }
+button { cursor: pointer; background: none; border: none; font: inherit; color: inherit; }
+
+/* Layout */
+.container { max-width: var(--content-default); margin-inline: auto; padding-inline: var(--space-6); }
+
+/* Header */
+header {
+  position: sticky; top: 0; z-index: 100;
+  background: color-mix(in oklch, var(--color-bg) 85%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid oklch(from var(--color-text) l c h / 0.08);
+  padding: var(--space-4) 0;
+}
+.header-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: var(--content-default); margin-inline: auto; padding-inline: var(--space-6);
+}
+.logo {
+  display: flex; align-items: center; gap: var(--space-2);
+  font-family: var(--font-display); font-size: var(--text-lg); color: var(--color-text); text-decoration: none;
+}
+.logo-mark {
+  width: 32px; height: 32px;
+}
+.theme-toggle {
+  width: 40px; height: 40px; border-radius: var(--radius-full);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--color-text-muted);
+  border: 1px solid oklch(from var(--color-text) l c h / 0.1);
+}
+.theme-toggle:hover { background: var(--color-surface-offset); color: var(--color-text); }
+
+/* Hero */
+.hero {
+  padding: clamp(var(--space-16), 8vw, var(--space-24)) 0 var(--space-12);
+  border-bottom: 1px solid var(--color-divider);
+}
+.badge {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-primary-highlight);
+  color: var(--color-primary);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.04em;
+  text-transform: uppercase; margin-bottom: var(--space-5);
+}
+.hero h1 {
+  font-size: var(--text-2xl);
+  color: var(--color-text);
+  margin-bottom: var(--space-4);
+  max-width: 18ch;
+}
+.hero h1 em { color: var(--color-primary); font-style: italic; }
+.hero-sub {
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+  max-width: 55ch;
+  margin-bottom: var(--space-8);
+}
+.hero-meta {
+  display: flex; flex-wrap: wrap; gap: var(--space-6);
+}
+.meta-item {
+  display: flex; flex-direction: column; gap: var(--space-1);
+}
+.meta-label { font-size: var(--text-xs); color: var(--color-text-faint); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+.meta-value { font-size: var(--text-sm); font-weight: 600; color: var(--color-text); }
+.meta-value.highlight { color: var(--color-primary); }
+
+/* Sections */
+.section { padding: var(--space-12) 0; border-bottom: 1px solid var(--color-divider); }
+.section:last-child { border-bottom: none; }
+.section-label {
+  font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--color-primary); margin-bottom: var(--space-6);
+  display: flex; align-items: center; gap: var(--space-2);
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--color-divider); }
+
+/* Proposal Body */
+.proposal-body {
+  font-size: var(--text-base);
+  color: var(--color-text);
+  line-height: 1.75;
+}
+.proposal-body p { margin-bottom: var(--space-4); max-width: 68ch; }
+.proposal-body p:last-child { margin-bottom: 0; }
+
+/* Skills Grid */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+.skill-card {
+  background: var(--color-surface);
+  border: 1px solid oklch(from var(--color-text) l c h / 0.08);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+}
+.skill-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); transition: box-shadow var(--transition-interactive), transform var(--transition-interactive); }
+.skill-icon {
+  width: 36px; height: 36px; margin-bottom: var(--space-3);
+  color: var(--color-primary);
+}
+.skill-title { font-weight: 600; font-size: var(--text-sm); margin-bottom: var(--space-1); }
+.skill-desc { font-size: var(--text-xs); color: var(--color-text-muted); }
+
+/* Stack List */
+.stack-list {
+  display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4);
+}
+.stack-tag {
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-surface-offset);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs); font-weight: 500; color: var(--color-text-muted);
+}
+
+/* Timeline */
+.timeline { margin-top: var(--space-6); display: flex; flex-direction: column; gap: 0; }
+.timeline-item {
+  display: grid; grid-template-columns: 80px 1fr;
+  gap: var(--space-4);
+  padding-bottom: var(--space-6);
+  position: relative;
+}
+.timeline-item:not(:last-child)::before {
+  content: ''; position: absolute;
+  left: 27px; top: 28px; bottom: 0; width: 1px;
+  background: var(--color-divider);
+}
+.timeline-marker {
+  width: 14px; height: 14px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  border: 3px solid var(--color-bg);
+  box-shadow: 0 0 0 1px var(--color-primary);
+  margin-top: 5px; margin-left: 21px; flex-shrink: 0;
+}
+.timeline-day {
+  font-size: var(--text-xs); font-weight: 700;
+  color: var(--color-text-muted); text-align: right;
+  padding-top: 2px;
+}
+.timeline-content { min-width: 0; }
+.timeline-title { font-weight: 600; font-size: var(--text-sm); margin-bottom: var(--space-1); }
+.timeline-desc { font-size: var(--text-xs); color: var(--color-text-muted); }
+
+/* Questions */
+.questions-list { margin-top: var(--space-6); display: flex; flex-direction: column; gap: var(--space-4); }
+.question-item {
+  display: flex; gap: var(--space-4); align-items: flex-start;
+  background: var(--color-surface);
+  border: 1px solid oklch(from var(--color-text) l c h / 0.08);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+}
+.q-number {
+  width: 28px; height: 28px; flex-shrink: 0;
+  background: var(--color-primary-highlight);
+  color: var(--color-primary);
+  border-radius: var(--radius-full);
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--text-xs); font-weight: 700;
+}
+.q-text { font-size: var(--text-sm); color: var(--color-text); line-height: 1.6; }
+.q-reason { font-size: var(--text-xs); color: var(--color-text-muted); margin-top: var(--space-1); }
+
+/* CTA */
+.cta-block {
+  background: var(--color-surface);
+  border: 1px solid oklch(from var(--color-primary) l c h / 0.25);
+  border-radius: var(--radius-xl);
+  padding: var(--space-10);
+  text-align: center;
+  margin-top: var(--space-8);
+}
+.cta-block h3 {
+  font-size: var(--text-xl);
+  margin-bottom: var(--space-3);
+}
+.cta-block p { font-size: var(--text-sm); color: var(--color-text-muted); margin-inline: auto; margin-bottom: var(--space-6); }
+.btn-primary {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  padding: var(--space-3) var(--space-8);
+  background: var(--color-primary);
+  color: #fff; border-radius: var(--radius-full);
+  font-size: var(--text-sm); font-weight: 600;
+  text-decoration: none; box-shadow: var(--shadow-md);
+}
+.btn-primary:hover { background: var(--color-primary-hover); }
+
+/* Print / copy block */
+.copy-block {
+  background: var(--color-surface-offset);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  margin-top: var(--space-6);
+  position: relative;
+}
+.copy-btn {
+  position: absolute; top: var(--space-4); right: var(--space-4);
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs); font-weight: 600; color: var(--color-text-muted);
+}
+.copy-btn:hover { color: var(--color-text); background: var(--color-surface-dynamic); }
+.copy-block p, .copy-block li { font-size: var(--text-sm); color: var(--color-text); max-width: 100%; }
+.copy-block p + p { margin-top: var(--space-3); }
+.copy-block ul { margin: var(--space-3) 0 var(--space-3) var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); }
+.copy-block strong { color: var(--color-primary); }
+
+/* Footer */
+footer {
+  padding: var(--space-8) 0;
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--color-text-faint);
+  border-top: 1px solid var(--color-divider);
+  margin-top: var(--space-12);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .skills-grid { grid-template-columns: 1fr 1fr; }
+  .hero-meta { gap: var(--space-4); }
+  .timeline-item { grid-template-columns: 50px 1fr; }
+}
+@media (max-width: 400px) {
+  .skills-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="#" class="logo">
+      <svg class="logo-mark" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="sarankirthic Logo">
+        <rect width="32" height="32" rx="8" fill="var(--color-primary)" opacity="0.12"/>
+        <path d="M8 10h6c3.3 0 6 2.7 6 6s-2.7 6-6 6H8V10z" stroke="var(--color-primary)" stroke-width="1.8" fill="none" stroke-linejoin="round"/>
+        <circle cx="22" cy="10" r="2" fill="var(--color-primary)"/>
+        <circle cx="22" cy="22" r="2" fill="var(--color-primary)" opacity="0.5"/>
+      </svg>
+      sarankirthic · Proposal
+    </a>
+    <button class="theme-toggle" data-theme-toggle aria-label="Switch to dark mode">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="badge">
+        <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="var(--color-primary)"/></svg>
+        Project Bid · AI Application
+      </div>
+      <h1>AI Text <em>Analysis</em> Application</h1>
+      <p class="hero-sub">A tailored proposal from a full-stack AI/ML engineer — delivering fast, accurate NLP pipelines and a polished user experience, from prototype to production.</p>
+      <div class="hero-meta">
+        <div class="meta-item">
+          <span class="meta-label">Delivery</span>
+          <span class="meta-value highlight">5–7 Business Days</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Expertise</span>
+          <span class="meta-value">NLP · ML · Full-Stack</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Availability</span>
+          <span class="meta-value">Immediate</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Location</span>
+          <span class="meta-value">Chennai, India (IST)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Proposal Letter -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">Cover Letter</div>
+      <div class="copy-block">
+        <button class="copy-btn" onclick="copyProposal(this)">Copy</button>
+        <p>Hi,</p>
+        <p>I'm a full-stack software engineer with hands-on experience building AI/ML-powered applications — from NLP pipelines and LLM integrations to real-time data analysis dashboards. I've shipped production systems using Python, FastAPI, and modern ML libraries (spaCy, Hugging Face Transformers, scikit-learn), and I understand how to make these systems fast, accurate, and easy for non-technical users to interact with.</p>
+        <p>For this project, I'd build a clean, end-to-end text analysis application that combines:</p>
+        <ul>
+          <li><strong>NLP core</strong> — sentiment analysis, entity recognition, keyword extraction, topic modelling, or classification depending on your use case</li>
+          <li><strong>User-friendly UI</strong> — a responsive web interface (React or plain HTML + FastAPI backend) where users paste or upload text and get clear, visual results instantly</li>
+          <li><strong>Fast processing</strong> — async task queuing (Celery/Redis or background workers) so even large documents return results quickly</li>
+        </ul>
+        <p>I've previously built Rasa-based chatbot systems, AI agent frameworks, and Kafka-powered message routing — so complex, multi-step text pipelines are well within my comfort zone. I treat code quality, documentation, and deployment seriously: Docker-containerised, cloud-ready (AWS/Vercel), and fully tested.</p>
+        <p>Before I begin, I have a few quick questions below to ensure I scope and deliver exactly what you need. I'm available immediately and can share working demos as I build.</p>
+        <p>Looking forward to working with you.<br><strong>Saran Kirthic SP</strong></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">Relevant Skills & Stack</div>
+      <div class="skills-grid">
+        <div class="skill-card">
+          <svg class="skill-icon" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="10" width="28" height="18" rx="3"/><path d="M12 10V8a6 6 0 0 1 12 0v2"/><circle cx="18" cy="19" r="3"/></svg>
+          <div class="skill-title">NLP & ML Models</div>
+          <div class="skill-desc">Hugging Face, spaCy, NLTK, scikit-learn, LLM fine-tuning</div>
+        </div>
+        <div class="skill-card">
+          <svg class="skill-icon" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.6"><polyline points="4 26 14 16 20 22 28 12 32 16"/></svg>
+          <div class="skill-title">Data Analysis</div>
+          <div class="skill-desc">pandas, NumPy, text classification, keyword extraction, topic modelling</div>
+        </div>
+        <div class="skill-card">
+          <svg class="skill-icon" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="28" height="28" rx="3"/><path d="M10 18h16M18 10v16"/></svg>
+          <div class="skill-title">Backend API</div>
+          <div class="skill-desc">Python, FastAPI, Flask, async processing, REST & WebSocket</div>
+        </div>
+        <div class="skill-card">
+          <svg class="skill-icon" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6" y="6" width="24" height="16" rx="2"/><path d="M10 30h16M18 22v8"/></svg>
+          <div class="skill-title">Frontend UI</div>
+          <div class="skill-desc">React, TypeScript, responsive dashboards, data visualization</div>
+        </div>
+        <div class="skill-card">
+          <svg class="skill-icon" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M18 4l14 8v12L18 32 4 24V12L18 4z"/></svg>
+          <div class="skill-title">Cloud & Deploy</div>
+          <div class="skill-desc">AWS, Docker, Vercel, CI/CD pipelines, production-ready delivery</div>
+        </div>
+        <div class="skill-card">
+          <svg class="skill-icon" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="18" cy="18" r="14"/><path d="M18 10v8l5 3"/></svg>
+          <div class="skill-title">Fast Turnaround</div>
+          <div class="skill-desc">Agile sprints, daily updates, working demo delivered within 5–7 days</div>
+        </div>
+      </div>
+      <div class="stack-list">
+        <span class="stack-tag">Python</span>
+        <span class="stack-tag">FastAPI</span>
+        <span class="stack-tag">Hugging Face Transformers</span>
+        <span class="stack-tag">spaCy</span>
+        <span class="stack-tag">scikit-learn</span>
+        <span class="stack-tag">React / TypeScript</span>
+        <span class="stack-tag">PostgreSQL</span>
+        <span class="stack-tag">Docker</span>
+        <span class="stack-tag">AWS</span>
+        <span class="stack-tag">Redis / Celery</span>
+        <span class="stack-tag">LangChain</span>
+        <span class="stack-tag">Kafka</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Delivery Timeline -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">Estimated Delivery Timeline</div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-day">Day 1</div>
+          <div style="display:flex; gap: var(--space-4);">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">Scope & Architecture</div>
+              <div class="timeline-desc">Finalise requirements, choose NLP models, set up project structure, API schema, and database design</div>
+            </div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-day">Day 2–3</div>
+          <div style="display:flex; gap: var(--space-4);">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">Core NLP Pipeline</div>
+              <div class="timeline-desc">Build and test the text analysis engine — sentiment, NER, classification, keyword extraction; connect to FastAPI backend</div>
+            </div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-day">Day 4–5</div>
+          <div style="display:flex; gap: var(--space-4);">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">User Interface</div>
+              <div class="timeline-desc">Build the frontend — text input, file upload, results visualisation (charts, entity highlights, score cards)</div>
+            </div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-day">Day 6</div>
+          <div style="display:flex; gap: var(--space-4);">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">Testing & Optimisation</div>
+              <div class="timeline-desc">Accuracy testing, performance profiling, async job handling, and edge-case handling</div>
+            </div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-day">Day 7</div>
+          <div style="display:flex; gap: var(--space-4);">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">Deployment & Handover</div>
+              <div class="timeline-desc">Dockerised deployment to AWS/Vercel, documentation, and full source code handover with a live demo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Clarifying Questions -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">Clarifying Questions</div>
+      <p style="color: var(--color-text-muted); font-size: var(--text-sm); margin-bottom: var(--space-2);">These will directly shape the architecture, model choice, and delivery scope:</p>
+      <div class="questions-list">
+        <div class="question-item">
+          <div class="q-number">1</div>
+          <div>
+            <div class="q-text">What specific text analysis tasks do you need — sentiment analysis, named entity recognition, document classification, summarisation, keyword extraction, or a combination?</div>
+            <div class="q-reason">This determines whether I use a lightweight library (spaCy) or a heavier transformer model (BERT/GPT), and directly affects speed vs. accuracy trade-offs.</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-number">2</div>
+          <div>
+            <div class="q-text">What is the typical volume and size of text being processed — single paragraphs, full documents, or bulk batch uploads (e.g., thousands of records)?</div>
+            <div class="q-reason">This decides whether I need async queuing (Celery/Redis), streaming results, or a simple synchronous API — a key architectural choice.</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-number">3</div>
+          <div>
+            <div class="q-text">Do you have a preferred tech stack or platform for the UI — a standalone web app, integration into an existing system, or an API-only backend?</div>
+            <div class="q-reason">Determines frontend framework, deployment target, and whether I need authentication, multi-user support, or just a single-user interface.</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-number">4</div>
+          <div>
+            <div class="q-text">Is the text domain general (news, social media, emails) or specialised (medical, legal, financial)? Do you have labelled training data if a custom model is needed?</div>
+            <div class="q-reason">Specialised domains often require fine-tuned models. Existing labelled data can dramatically improve accuracy and reduce development time.</div>
+          </div>
+        </div>
+        <div class="question-item">
+          <div class="q-number">5</div>
+          <div>
+            <div class="q-text">What are your data privacy requirements — can text be sent to external APIs (like OpenAI), or must everything run locally / on your own servers?</div>
+            <div class="q-reason">This is a binary architectural split: cloud API (fast, low cost) vs. self-hosted open-source models (full privacy, higher compute). The answer changes the entire model selection strategy.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section" style="border: none;">
+    <div class="container">
+      <div class="cta-block">
+        <h3>Ready to Build Together</h3>
+        <p>Share your answers to the five questions and I'll send a detailed scope, fixed quote, and start immediately. Daily progress updates guaranteed.</p>
+        <a href="mailto:sarankirthic@example.com" class="btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Send a Message
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container">
+    Proposal by sarankirthic · Full-Stack AI Engineer · Chennai, India · May 2026
+  </div>
+</footer>
+
+<script>
+(function(){
+  const t = document.querySelector('[data-theme-toggle]');
+  const r = document.documentElement;
+  let d = matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light';
+  r.setAttribute('data-theme', d);
+  if (t) {
+    t.addEventListener('click', () => {
+      d = d === 'dark' ? 'light' : 'dark';
+      r.setAttribute('data-theme', d);
+      t.setAttribute('aria-label', 'Switch to ' + (d === 'dark' ? 'light' : 'dark') + ' mode');
+      t.innerHTML = d === 'dark'
+        ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+        : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+    });
+  }
+})();
+
+function copyProposal(btn) {
+  const block = btn.closest('.copy-block');
+  const text = block.innerText.replace('Copy\n', '').replace('Copy', '').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+  });
+}
+</script>
+</body>
+</html>
