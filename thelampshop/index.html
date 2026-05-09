@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>The Lampshade Shop · Wireframe Explorations</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Caveat:wght@400;600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+<style>
+  body{ font-family:'Inter', sans-serif; }
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="primitives.jsx"></script>
+<script type="text/babel" src="direction-a.jsx"></script>
+<script type="text/babel" src="direction-b.jsx"></script>
+<script type="text/babel" src="direction-c.jsx"></script>
+
+<script type="text/babel">
+  const { useEffect } = React;
+
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "coral": true,
+    "wobble": true,
+    "lineStyle": "sketchy"
+  }/*EDITMODE-END*/;
+
+  // Apply tweaks to body class
+  const applyTweaks = (t) => {
+    document.body.classList.toggle('no-coral', !t.coral);
+    document.body.classList.toggle('clean', t.lineStyle === 'clean');
+  };
+
+  const App = () => {
+    const t = window.useTweaks ? window.useTweaks(TWEAK_DEFAULTS) : { tweaks: TWEAK_DEFAULTS, setTweak: ()=>{} };
+    const tweaks = t.tweaks || t;
+    const setTweak = t.setTweak || (()=>{});
+
+    useEffect(() => { applyTweaks(tweaks); }, [tweaks]);
+
+    const W = 1280, H = 880;
+
+    return (
+      <>
+        <SketchDefs />
+        <DesignCanvas title="The Lampshade Shop · Wireframes" subtitle="3 directions × 3 screens — sketchy mid-fi · click any board to focus">
+
+          <DCSection id="intro" title="Brief" subtitle="Redesign of thelampshadeshop.com — minimal-luxury, gallery-feel. Based on cream canvas + coral, serif/sans pairing, 96px rhythm, pill badges, dark callouts. Three directions explored side-by-side.">
+            <DCArtboard id="legend" label="Legend & system" width={680} height={420}>
+              <div style={{padding:'24px 28px', height:'100%', background:'var(--paper)'}} className="col gap-md">
+                <div className="serif" style={{fontSize:32, letterSpacing:'-0.02em'}}>Wireframe system</div>
+                <div className="row gap-lg">
+                  <div className="col gap-xs" style={{flex:1}}>
+                    <div className="tag">CANVAS</div>
+                    <div className="row gap-xs" style={{alignItems:'center'}}>
+                      <div className="box" style={{width:30, height:30, background:'var(--paper)'}}/>
+                      <div className="box" style={{width:30, height:30, background:'var(--paper-2)'}}/>
+                      <div className="box" style={{width:30, height:30, background:'var(--ink)'}}/>
+                      <div className="box" style={{width:30, height:30, background:'var(--coral)'}}/>
+                    </div>
+                    <div className="mono" style={{fontSize:10, color:'var(--ink-soft)'}}>cream · oat · ink · coral</div>
+                  </div>
+                  <div className="col gap-xs" style={{flex:1}}>
+                    <div className="tag">TYPE</div>
+                    <div className="serif" style={{fontSize:20, lineHeight:1}}>Cormorant 500 · display</div>
+                    <div style={{fontFamily:'Inter', fontSize:12}}>Inter 400/500 · body / nav</div>
+                    <div className="mono" style={{fontSize:11}}>IBM Plex Mono · specs</div>
+                    <div className="hand" style={{fontSize:18, color:'var(--coral)'}}>Caveat · annotations</div>
+                  </div>
+                </div>
+                <div className="row gap-lg">
+                  <div className="col gap-xs" style={{flex:1}}>
+                    <div className="tag">CONVENTIONS</div>
+                    <div style={{fontFamily:'Inter', fontSize:12, color:'var(--ink-soft)', lineHeight:1.6}}>
+                      · striped boxes = product photo placeholders<br/>
+                      · coral handwriting = annotation / hint<br/>
+                      · lamp silhouettes drawn to relative scale<br/>
+                      · hairline + dashed = section dividers
+                    </div>
+                  </div>
+                  <div className="col gap-xs" style={{flex:1}}>
+                    <div className="tag">TWEAKS</div>
+                    <div style={{fontFamily:'Inter', fontSize:12, color:'var(--ink-soft)', lineHeight:1.6}}>
+                      Open the Tweaks panel (top-right) to:<br/>
+                      · toggle the coral accent on/off<br/>
+                      · switch sketchy vs clean line style
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="dirA" title="A · Editorial Atelier"
+                    subtitle="Magazine-cover hero · single shade per season · long-read PDP. Borrows DESIGN.md most directly: serif display, oversized italic, generous whitespace, coral as scarce voltage.">
+            <DCArtboard id="A-home" label="Home · Issue Nº 014" width={W} height={H}><A_Home/></DCArtboard>
+            <DCArtboard id="A-list" label="Listing · The Archive" width={W} height={H}><A_Listing/></DCArtboard>
+            <DCArtboard id="A-detail" label="Detail · Long-read" width={W} height={H}><A_Detail/></DCArtboard>
+          </DCSection>
+
+          <DCSection id="dirB" title="B · Specimen Index"
+                    subtitle="Catalog-as-archive. Hero IS the Find-a-Fit finder. Listing is a measured table; PDP shows technical drawings + spec list. For homeowners replacing a lamp who care about fit first, vibes second.">
+            <DCArtboard id="B-home" label="Home · Specimen book" width={W} height={H}><B_Home/></DCArtboard>
+            <DCArtboard id="B-list" label="Listing · Index table" width={W} height={H}><B_Listing/></DCArtboard>
+            <DCArtboard id="B-detail" label="Detail · Spec sheet" width={W} height={H}><B_Detail/></DCArtboard>
+          </DCSection>
+
+          <DCSection id="dirC" title="C · Made for You"
+                    subtitle="Configurator-first. Landing IS a builder; listing splits Ready vs Made-to-order; PDP has a live preview with the builder docked at the bottom (in dark surface). Boldest re-org of the IA.">
+            <DCArtboard id="C-home" label="Home · Builder canvas" width={W} height={H}><C_Home/></DCArtboard>
+            <DCArtboard id="C-list" label="Listing · Ready / Made" width={W} height={H}><C_Listing/></DCArtboard>
+            <DCArtboard id="C-detail" label="Detail · Live preview + builder" width={W} height={H}><C_Detail/></DCArtboard>
+          </DCSection>
+
+        </DesignCanvas>
+
+        {window.TweaksPanel && (
+          <TweaksPanel title="Tweaks">
+            <TweakSection title="Style">
+              <TweakRadio
+                label="Line style"
+                value={tweaks.lineStyle}
+                onChange={v=>setTweak('lineStyle', v)}
+                options={[{value:'sketchy', label:'Sketchy'},{value:'clean', label:'Clean'}]}
+              />
+              <TweakToggle
+                label="Coral accent"
+                value={tweaks.coral}
+                onChange={v=>setTweak('coral', v)}
+              />
+            </TweakSection>
+          </TweaksPanel>
+        )}
+      </>
+    );
+  };
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+
+</body>
+</html>

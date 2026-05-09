@@ -1,0 +1,158 @@
+/* ───────── lampshade shop wireframes — sketchy mid-fi ───────── */
+
+:root{
+  --paper: #faf8f3;
+  --paper-2: #f1ede2;
+  --ink: #1a1815;
+  --ink-soft: #4a463f;
+  --ink-mute: #8a857a;
+  --rule: #1a1815;
+  --coral: #cc785c;
+  --coral-soft: #f0d9cf;
+}
+
+html, body{ margin:0; padding:0; background:var(--paper); color:var(--ink); }
+*{ box-sizing:border-box; }
+
+/* sketch filter applied to most "drawn" elements */
+.sketchy{ filter:url(#sketch-wobble); }
+
+/* core type ramp */
+.serif{ font-family:'Cormorant Garamond', 'EB Garamond', Garamond, serif; font-weight:500; letter-spacing:-0.01em; }
+.hand { font-family:'Caveat', 'Kalam', cursive; }
+.mono { font-family:'IBM Plex Mono', ui-monospace, monospace; }
+.sans { font-family:'Inter', -apple-system, sans-serif; }
+
+/* hand-drawn box with wobbling border via SVG; we just use solid + filter */
+.box{
+  border: 1.5px solid var(--ink);
+  background: transparent;
+}
+.box-thin{ border-width:1px; }
+.box-thick{ border-width:2px; }
+.box-coral{ border-color: var(--coral); }
+.fill-paper2{ background: var(--paper-2); }
+.fill-coral{ background: var(--coral); color:#fff; }
+.fill-coral-soft{ background: var(--coral-soft); }
+.fill-ink{ background: var(--ink); color:var(--paper); }
+
+/* dashed pencil rule */
+.rule{ border:0; border-top:1.5px solid var(--ink); height:0; }
+.rule-dashed{ border:0; border-top:1.5px dashed var(--ink); height:0; }
+.rule-thin{ border-top-width:1px; }
+
+/* striped placeholder for an image we don't have */
+.stripes{
+  background-image: repeating-linear-gradient(135deg,
+    var(--paper-2) 0 8px,
+    var(--paper) 8px 16px);
+  border:1.5px solid var(--ink);
+  position:relative;
+  display:flex; align-items:center; justify-content:center;
+  color: var(--ink-soft);
+}
+.stripes-coral{
+  background-image: repeating-linear-gradient(135deg,
+    var(--coral-soft) 0 8px,
+    var(--paper) 8px 16px);
+}
+.stripes-dark{
+  background-image: repeating-linear-gradient(135deg,
+    #2a2622 0 8px,
+    #1a1815 8px 16px);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+/* annotation flag */
+.flag{
+  position:absolute;
+  font-family:'Caveat', cursive;
+  color: var(--coral);
+  font-size: 16px;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events:none;
+}
+.flag svg{ display:block; overflow:visible; }
+
+/* small underline in handwriting */
+.scribble-underline{
+  background-image: linear-gradient(transparent 90%, var(--coral) 90%);
+}
+
+/* skeleton/scanline for fields */
+.field{
+  border:1.5px solid var(--ink);
+  background:var(--paper);
+  height:38px;
+  display:flex; align-items:center;
+  padding:0 12px;
+  font-family:'Caveat', cursive;
+  color:var(--ink-mute);
+  font-size:18px;
+}
+
+/* button (sketchy) */
+.btn{
+  display:inline-flex; align-items:center; gap:6px;
+  border:1.5px solid var(--ink);
+  background:var(--paper);
+  padding:10px 18px;
+  font-family:'Inter', sans-serif;
+  font-size:13px;
+  font-weight:500;
+  letter-spacing:0.02em;
+  color:var(--ink);
+  cursor:pointer;
+}
+.btn-coral{ background:var(--coral); color:#fff; border-color:var(--coral); }
+.btn-ink{ background:var(--ink); color:var(--paper); }
+.btn-sm{ padding:6px 12px; font-size:11px; }
+
+/* small caps tag */
+.tag{
+  font-family:'Inter', sans-serif;
+  font-size:10px;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+}
+.tag-pill{
+  display:inline-block;
+  border:1px solid var(--ink);
+  border-radius:999px;
+  padding:3px 10px;
+  font-family:'Inter', sans-serif;
+  font-size:10px;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+}
+
+/* helper */
+.row{ display:flex; }
+.col{ display:flex; flex-direction:column; }
+.gap-xs{ gap:6px; }
+.gap-sm{ gap:10px; }
+.gap-md{ gap:16px; }
+.gap-lg{ gap:24px; }
+.gap-xl{ gap:40px; }
+.center{ display:flex; align-items:center; justify-content:center; }
+
+/* tweak: hide coral */
+body.no-coral .btn-coral{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+body.no-coral .fill-coral{ background:var(--ink); color:var(--paper); }
+body.no-coral .stripes-coral{
+  background-image: repeating-linear-gradient(135deg,
+    var(--paper-2) 0 8px, var(--paper) 8px 16px);
+}
+body.no-coral .flag{ color:var(--ink); }
+body.no-coral .scribble-underline{ background-image: linear-gradient(transparent 90%, var(--ink) 90%); }
+body.no-coral .box-coral{ border-color: var(--ink); }
+body.no-coral .fill-coral-soft{ background: var(--paper-2); }
+
+/* tweak: turn off wobble (clean lines) */
+body.clean .sketchy{ filter:none; }
+body.clean .hand{ font-family:'Inter', sans-serif !important; font-weight:500; }
+body.clean .flag{ font-family:'Inter', sans-serif; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; }
+body.clean .field{ font-family:'Inter', sans-serif; font-size:13px; }
